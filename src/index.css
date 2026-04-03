@@ -1,13 +1,68 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* ===== RESET ===== */
+* {
+  box-sizing: border-box;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --bg: #f8fafc;
+  --text: #111827;
+  --card: #ffffff;
+  --border: #e5e7eb;
+}
+
+
+/* ===== GLOBAL APPLY (🔥 أهم جزء) ===== */
+html, body, #root {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 👇 هذا السطر السحري */
+body * {
+  color: var(--text);
+}
+
+/* 👇 يخلي كل الكروت والخلفيات تتغير */
+div, section, main, nav, header, footer {
+  background-color: transparent;
+}
+
+/* 👇 override لأي background ثابت */
+.dark div,
+.dark section,
+.dark main,
+.dark nav,
+.dark header,
+.dark footer {
+  background-color: var(--card) !important;
+  border-color: var(--border) !important;
+}
+
+/* ===== INPUTS ===== */
+input, textarea, select {
+  background: var(--card);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+/* ===== BUTTON ===== */
+button {
+  color: var(--text);
+}
+
+/* ===== SMOOTH TRANSITION ===== */
+* {
+  transition: background 0.25s ease, color 0.25s ease, border 0.25s ease;
+}
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+  border-radius: 10px;
 }
