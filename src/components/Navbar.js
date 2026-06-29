@@ -1,42 +1,52 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useAuth } from "../context/AuthContext";
 import { useWishlist } from "../context/WishlistContext";
+import { theme } from "../styles/theme";
 
 function Navbar() {
   const { totalItems } = useCart();
   const { user, logout } = useAuth();
   const { wishlistItems } = useWishlist();
 
+  const navStyle = ({ isActive }) => ({
+    ...styles.link,
+    background: isActive ? "rgba(255,255,255,0.12)" : "transparent",
+    borderColor: isActive ? "rgba(255,255,255,0.22)" : "transparent",
+  });
+
   return (
     <nav style={styles.nav}>
-      <div style={styles.inner}>
-        <Link to="/" style={styles.logo}>
-          <span style={styles.logoDot}></span>
-          Tech Store
+      <div className="navbar-inner" style={styles.inner}>
+        <Link to="/" style={styles.logo} className="interactive">
+          <span style={styles.logoIcon}>⚡</span>
+          <span>Tech Store</span>
         </Link>
 
-        <div style={styles.links}>
-          <Link to="/" style={styles.link}>Home</Link>
-          <Link to="/products" style={styles.link}>Products</Link>
+        <div className="navbar-links" style={styles.links}>
+          <NavLink to="/" style={navStyle}>
+            Home
+          </NavLink>
 
-          <Link to="/wishlist" style={styles.link}>
-            ❤️ Wishlist ({wishlistItems.length})
-          </Link>
+          <NavLink to="/products" style={navStyle}>
+            Products
+          </NavLink>
 
-          <Link to="/cart" style={styles.link}>
-            🛒 Cart ({totalItems})
-          </Link>
+          <NavLink to="/wishlist" style={navStyle}>
+            Wishlist <span style={styles.badge}>{wishlistItems.length}</span>
+          </NavLink>
+
+          <NavLink to="/cart" style={navStyle}>
+            Cart <span style={styles.badge}>{totalItems}</span>
+          </NavLink>
 
           {user ? (
             <>
-              <Link to="/my-orders" style={styles.link}>
-                📦 My Orders
-              </Link>
+              <NavLink to="/my-orders" style={navStyle}>
+                My Orders
+              </NavLink>
 
-              <span style={styles.userText}>
-                {user.email}
-              </span>
+              <span style={styles.userPill}>{user.email?.split("@")[0]}</span>
 
               <button onClick={logout} style={styles.logoutBtn}>
                 Logout
@@ -44,8 +54,15 @@ function Navbar() {
             </>
           ) : (
             <>
-              <Link to="/login" style={styles.link}>Login</Link>
-              <Link to="/register" style={styles.registerBtn}>
+              <NavLink to="/login" style={navStyle}>
+                Login
+              </NavLink>
+
+              <Link
+                to="/register"
+                style={styles.registerBtn}
+                className="interactive"
+              >
                 Register
               </Link>
             </>
@@ -61,71 +78,110 @@ const styles = {
     position: "sticky",
     top: 0,
     zIndex: 1000,
-    background: "#111827",
-    borderBottom: "1px solid rgba(255,255,255,0.08)",
+    background: "rgba(11, 16, 32, 0.78)",
+    borderBottom: "1px solid rgba(255,255,255,0.10)",
+    backdropFilter: "blur(18px)",
   },
+
   inner: {
-    maxWidth: "1400px",
+    width: "min(1400px, 100%)",
     margin: "0 auto",
-    padding: "16px 24px",
+    padding: "14px 24px",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    gap: "20px",
+    gap: "18px",
     flexWrap: "wrap",
   },
+
   logo: {
     display: "flex",
     alignItems: "center",
     gap: "10px",
     color: "#fff",
     textDecoration: "none",
-    fontSize: "26px",
-    fontWeight: "800",
+    fontSize: "24px",
+    fontWeight: 900,
+    letterSpacing: "-0.4px",
   },
-  logoDot: {
-    width: "12px",
-    height: "12px",
-    borderRadius: "50%",
-    background: "linear-gradient(135deg, #3B82F6, #8B5CF6)",
-    boxShadow: "0 0 12px #3B82F6",
+
+  logoIcon: {
+    width: "38px",
+    height: "38px",
+    borderRadius: "14px",
+    display: "grid",
+    placeItems: "center",
+    background: theme.gradients.primary,
+    boxShadow: "0 12px 28px rgba(59,130,246,.34)",
   },
+
   links: {
     display: "flex",
-    gap: "16px",
+    gap: "10px",
     alignItems: "center",
     flexWrap: "wrap",
   },
+
   link: {
-    color: "#fff",
+    color: "#F8FAFC",
     textDecoration: "none",
-    fontWeight: "600",
+    fontWeight: 750,
     fontSize: "14px",
-    padding: "8px 10px",
-    borderRadius: "10px",
+    padding: "9px 12px",
+    borderRadius: "14px",
+    border: "1px solid transparent",
+    display: "inline-flex",
+    alignItems: "center",
+    gap: "7px",
+    transition: theme.transition,
   },
-  userText: {
-    color: "#cbd5e1",
-    fontSize: "14px",
-    paddingLeft: "14px",
-    borderLeft: "1px solid rgba(255,255,255,0.12)",
-  },
-  logoutBtn: {
-    padding: "10px 16px",
-    border: "none",
-    borderRadius: "12px",
-    background: "#EF4444",
+
+  badge: {
+    minWidth: "23px",
+    height: "23px",
+    padding: "0 7px",
+    borderRadius: theme.radius.full,
+    display: "inline-flex",
+    justifyContent: "center",
+    alignItems: "center",
+    background: theme.gradients.primary,
     color: "#fff",
-    cursor: "pointer",
-    fontWeight: "700",
+    fontSize: "12px",
+    fontWeight: 900,
   },
+
+  userPill: {
+    maxWidth: "160px",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+    color: "#DBEAFE",
+    background: "rgba(255,255,255,0.08)",
+    border: "1px solid rgba(255,255,255,0.12)",
+    padding: "9px 12px",
+    borderRadius: theme.radius.full,
+    fontWeight: 700,
+    fontSize: "13px",
+  },
+
+  logoutBtn: {
+    padding: "10px 15px",
+    border: "none",
+    borderRadius: "14px",
+    background: "rgba(239,68,68,0.16)",
+    color: "#FCA5A5",
+    cursor: "pointer",
+    fontWeight: 800,
+  },
+
   registerBtn: {
     textDecoration: "none",
-    padding: "10px 16px",
-    borderRadius: "12px",
-    background: "linear-gradient(135deg, #3B82F6, #8B5CF6)",
+    padding: "11px 16px",
+    borderRadius: "14px",
+    background: theme.gradients.primary,
     color: "#fff",
-    fontWeight: "700",
+    fontWeight: 850,
+    boxShadow: "0 12px 26px rgba(59,130,246,.28)",
   },
 };
 

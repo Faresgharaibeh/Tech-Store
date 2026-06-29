@@ -1,360 +1,458 @@
 import { Link } from "react-router-dom";
-import { useCart } from "../context/CartContext";
 import { productImages } from "../data/productImages";
+import { useCart } from "../context/CartContext";
 import { theme } from "../styles/theme";
 
 function Cart() {
   const {
     cartItems,
+    removeFromCart,
     increaseQuantity,
     decreaseQuantity,
-    removeFromCart,
     clearCart,
     totalPrice,
   } = useCart();
 
+  const shipping = cartItems.length > 0 ? 7.99 : 0;
+  const grandTotal = totalPrice + shipping;
+
   if (cartItems.length === 0) {
     return (
-      <div style={styles.page}>
-        <div style={styles.emptyContainer}>
-          <div style={styles.emptyIcon}>🛒</div>
-          <h1 style={styles.emptyTitle}>Your Cart is Empty</h1>
-          <p style={styles.emptyText}>
-            Looks like you haven’t added anything yet.
-          </p>
-          <Link to="/" style={styles.shopBtn}>
-            Continue Shopping
-          </Link>
+      <main className="page-wrap">
+        <div className="container-xl">
+          <section style={styles.emptyState} className="fade-up">
+            <div style={styles.emptyIcon}>🛒</div>
+            <h1 style={styles.emptyTitle}>Your cart is empty</h1>
+            <p style={styles.emptyText}>
+              Looks like you have not added anything yet. Start shopping and
+              build your perfect tech setup.
+            </p>
+
+            <Link to="/products" style={styles.primaryBtn}>
+              Start Shopping
+            </Link>
+          </section>
         </div>
-      </div>
+      </main>
     );
   }
 
   return (
-    <div style={styles.page}>
-      <div style={styles.container}>
-        <div style={styles.headerRow}>
+    <main className="page-wrap">
+      <div className="container-xl">
+        <section style={styles.header} className="fade-up">
           <div>
-            <p style={styles.label}>Shopping</p>
-            <h1 style={styles.heading}>Your Cart</h1>
+            <span style={styles.kicker}>Shopping Cart</span>
+            <h1 style={styles.title}>Review your selected products</h1>
+            <p style={styles.subtitle}>
+              Adjust quantities, remove items, then continue to checkout.
+            </p>
           </div>
 
-          <button style={styles.clearBtnTop} onClick={clearCart}>
+          <button onClick={clearCart} style={styles.clearBtn}>
             Clear Cart
           </button>
+        </section>
+
+        <div style={styles.stepper} className="fade-up">
+          <div style={styles.stepActive}>1. Cart</div>
+          <div style={styles.stepLine}></div>
+          <div style={styles.step}>2. Checkout</div>
+          <div style={styles.stepLine}></div>
+          <div style={styles.step}>3. Success</div>
         </div>
 
-        <div style={styles.wrapper}>
-          <div style={styles.itemsSection}>
-            {cartItems.map((item) => (
-              <div key={item.id} style={styles.card}>
-                <div style={styles.imageWrap}>
-                  <img
-                    src={productImages[item.name]}
-                    alt={item.name}
-                    style={styles.image}
-                  />
-                </div>
+        <section
+          className="responsive-grid-cart"
+          style={styles.layout}
+        >
+          <div style={styles.items}>
+            {cartItems.map((item) => {
+              const image = productImages[item.name];
 
-                <div style={styles.info}>
-                  <p style={styles.brand}>{item.brand}</p>
-                  <h3 style={styles.name}>{item.name}</h3>
-                  <p style={styles.itemPrice}>${Number(item.price).toFixed(2)}</p>
+              return (
+                <article
+                  key={item.id}
+                  style={styles.itemCard}
+                  className="cart-item-card fade-up"
+                >
+                  <div style={styles.imageWrap}>
+                    <img src={image} alt={item.name} style={styles.image} />
+                  </div>
 
-                  <div style={styles.actions}>
-                    <div style={styles.qtyBox}>
-                      <button
-                        style={styles.qtyBtn}
-                        onClick={() => decreaseQuantity(item.id)}
-                      >
-                        −
-                      </button>
-
-                      <span style={styles.qtyValue}>{item.quantity}</span>
-
-                      <button
-                        style={styles.qtyBtn}
-                        onClick={() => increaseQuantity(item.id)}
-                      >
-                        +
-                      </button>
-                    </div>
+                  <div>
+                    <p style={styles.category}>{item.category}</p>
+                    <h3 style={styles.itemTitle}>{item.name}</h3>
+                    <p style={styles.itemPrice}>
+                      ${Number(item.price || 0).toFixed(2)}
+                    </p>
 
                     <button
-                      style={styles.removeBtn}
                       onClick={() => removeFromCart(item.id)}
+                      style={styles.removeBtn}
                     >
                       Remove
                     </button>
                   </div>
-                </div>
 
-                <div style={styles.subtotal}>
-                  ${(Number(item.price) * Number(item.quantity)).toFixed(2)}
-                </div>
-              </div>
-            ))}
+                  <div style={styles.quantityBox}>
+                    <button
+                      onClick={() => decreaseQuantity(item.id)}
+                      style={styles.qtyBtn}
+                    >
+                      -
+                    </button>
+
+                    <span style={styles.qtyValue}>{item.quantity}</span>
+
+                    <button
+                      onClick={() => increaseQuantity(item.id)}
+                      style={styles.qtyBtn}
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div style={styles.subtotal} className="cart-subtotal">
+                    <span>Subtotal</span>
+                    <strong>
+                      ${(Number(item.price || 0) * item.quantity).toFixed(2)}
+                    </strong>
+                  </div>
+                </article>
+              );
+            })}
           </div>
 
-          <div style={styles.summary}>
+          <aside style={styles.summary} className="sticky-card fade-up">
             <h2 style={styles.summaryTitle}>Order Summary</h2>
 
             <div style={styles.summaryRow}>
               <span>Items</span>
-              <span>{cartItems.length}</span>
+              <strong>{cartItems.length}</strong>
             </div>
 
             <div style={styles.summaryRow}>
               <span>Subtotal</span>
-              <span>${Number(totalPrice).toFixed(2)}</span>
+              <strong>${totalPrice.toFixed(2)}</strong>
             </div>
 
-            <div style={styles.summaryDivider}></div>
+            <div style={styles.summaryRow}>
+              <span>Shipping</span>
+              <strong>${shipping.toFixed(2)}</strong>
+            </div>
+
+            <div style={styles.divider}></div>
 
             <div style={styles.totalRow}>
               <span>Total</span>
-              <span>${Number(totalPrice).toFixed(2)}</span>
+              <strong>${grandTotal.toFixed(2)}</strong>
             </div>
 
             <Link to="/checkout" style={styles.checkoutBtn}>
-              Proceed to Checkout
+              Continue to Checkout
             </Link>
-          </div>
-        </div>
+
+            <Link to="/products" style={styles.continueLink}>
+              ← Continue Shopping
+            </Link>
+          </aside>
+        </section>
       </div>
-    </div>
+    </main>
   );
 }
 
 const styles = {
-  page: {
-    minHeight: "100vh",
-    backgroundColor: theme.colors.background,
-    padding: "28px",
-  },
-  container: {
-    maxWidth: "1400px",
-    margin: "0 auto",
-  },
-  headerRow: {
+  header: {
+    marginBottom: "20px",
+    padding: "34px",
+    borderRadius: theme.radius.xl,
+    background: "linear-gradient(135deg, #FFFFFF, #EEF2FF)",
+    border: `1px solid ${theme.colors.border}`,
+    boxShadow: theme.shadow.sm,
     display: "flex",
     justifyContent: "space-between",
-    alignItems: "end",
-    gap: "16px",
+    gap: "18px",
+    alignItems: "center",
     flexWrap: "wrap",
-    marginBottom: "24px",
   },
-  label: {
-    margin: "0 0 8px",
+
+  kicker: {
     color: theme.colors.accent,
-    fontSize: "13px",
-    fontWeight: "700",
+    fontWeight: 950,
     textTransform: "uppercase",
-    letterSpacing: "0.5px",
+    fontSize: "13px",
+    letterSpacing: ".6px",
   },
-  heading: {
-    margin: 0,
+
+  title: {
+    margin: "10px 0 10px",
     fontSize: "40px",
-    fontWeight: "800",
-    color: theme.colors.text,
+    lineHeight: 1.1,
+    fontWeight: 950,
+    letterSpacing: "-1px",
   },
-  clearBtnTop: {
-    padding: "12px 18px",
+
+  subtitle: {
+    margin: 0,
+    color: theme.colors.textMuted,
+    lineHeight: 1.7,
+    fontWeight: 600,
+  },
+
+  clearBtn: {
     border: "none",
-    borderRadius: "14px",
-    backgroundColor: theme.colors.danger,
-    color: "#fff",
+    borderRadius: "16px",
+    padding: "13px 18px",
+    background: "rgba(239,68,68,.10)",
+    color: theme.colors.danger,
+    fontWeight: 950,
     cursor: "pointer",
-    fontWeight: "700",
-    boxShadow: theme.shadow.sm,
   },
-  wrapper: {
+
+  stepper: {
+    marginBottom: "22px",
+    padding: "16px",
+    borderRadius: theme.radius.lg,
+    background: theme.colors.surface,
+    border: `1px solid ${theme.colors.border}`,
+    boxShadow: theme.shadow.sm,
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    flexWrap: "wrap",
+  },
+
+  stepActive: {
+    padding: "10px 14px",
+    borderRadius: theme.radius.full,
+    background: theme.gradients.primary,
+    color: "#fff",
+    fontWeight: 950,
+  },
+
+  step: {
+    padding: "10px 14px",
+    borderRadius: theme.radius.full,
+    background: theme.colors.surfaceSoft,
+    color: theme.colors.textMuted,
+    fontWeight: 850,
+  },
+
+  stepLine: {
+    flex: 1,
+    minWidth: "40px",
+    height: "2px",
+    background: theme.colors.border,
+  },
+
+  layout: {
     display: "grid",
-    gridTemplateColumns: "1.8fr 0.9fr",
-    gap: "26px",
+    gridTemplateColumns: "1fr 360px",
+    gap: "24px",
     alignItems: "start",
   },
-  itemsSection: {
+
+  items: {
+    display: "grid",
+    gap: "16px",
+  },
+
+  itemCard: {
+    display: "grid",
+    gridTemplateColumns: "140px 1fr 150px 140px",
+    gap: "18px",
+    alignItems: "center",
+    padding: "16px",
+    borderRadius: theme.radius.lg,
+    background: theme.colors.surface,
+    border: `1px solid ${theme.colors.border}`,
+    boxShadow: theme.shadow.sm,
+  },
+
+  imageWrap: {
+    height: "120px",
+    borderRadius: "22px",
+    background: "linear-gradient(145deg, #EEF2FF, #FFFFFF)",
+    display: "grid",
+    placeItems: "center",
+  },
+
+  image: {
+    width: "100%",
+    height: "100%",
+    objectFit: "contain",
+    padding: "16px",
+  },
+
+  category: {
+    margin: "0 0 7px",
+    color: theme.colors.accent,
+    fontWeight: 900,
+    fontSize: "13px",
+  },
+
+  itemTitle: {
+    margin: 0,
+    fontSize: "20px",
+    fontWeight: 950,
+  },
+
+  itemPrice: {
+    margin: "8px 0 12px",
+    color: theme.colors.textMuted,
+    fontWeight: 800,
+  },
+
+  removeBtn: {
+    border: "none",
+    borderRadius: "12px",
+    padding: "9px 12px",
+    background: "rgba(239,68,68,.10)",
+    color: theme.colors.danger,
+    fontWeight: 900,
+    cursor: "pointer",
+  },
+
+  quantityBox: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    borderRadius: "18px",
+    background: theme.colors.surfaceSoft,
+    padding: "7px",
+  },
+
+  qtyBtn: {
+    width: "40px",
+    height: "40px",
+    borderRadius: "14px",
+    border: "none",
+    background: "#fff",
+    fontWeight: 950,
+    cursor: "pointer",
+  },
+
+  qtyValue: {
+    fontWeight: 950,
+  },
+
+  subtotal: {
+    textAlign: "right",
     display: "flex",
     flexDirection: "column",
-    gap: "18px",
+    gap: "5px",
+    color: theme.colors.textMuted,
+    fontWeight: 800,
   },
+
   summary: {
     position: "sticky",
-    top: "100px",
-    border: `1px solid ${theme.colors.border}`,
-    borderRadius: theme.radius.lg,
+    top: "96px",
     padding: "24px",
-    backgroundColor: theme.colors.surface,
+    borderRadius: theme.radius.xl,
+    background: theme.colors.surface,
+    border: `1px solid ${theme.colors.border}`,
     boxShadow: theme.shadow.md,
   },
+
   summaryTitle: {
-    marginTop: 0,
-    marginBottom: "20px",
+    margin: "0 0 20px",
     fontSize: "24px",
-    color: theme.colors.text,
+    fontWeight: 950,
   },
+
   summaryRow: {
     display: "flex",
     justifyContent: "space-between",
     marginBottom: "14px",
     color: theme.colors.textMuted,
-    fontSize: "15px",
+    fontWeight: 800,
   },
-  summaryDivider: {
+
+  divider: {
     height: "1px",
-    backgroundColor: theme.colors.border,
+    background: theme.colors.border,
     margin: "18px 0",
   },
+
   totalRow: {
     display: "flex",
     justifyContent: "space-between",
-    marginBottom: "20px",
+    alignItems: "center",
     fontSize: "22px",
-    fontWeight: "800",
-    color: theme.colors.text,
+    fontWeight: 950,
   },
+
   checkoutBtn: {
     display: "block",
+    marginTop: "22px",
     textAlign: "center",
     textDecoration: "none",
-    padding: "14px 18px",
-    borderRadius: "16px",
-    background: `linear-gradient(135deg, ${theme.colors.accent}, ${theme.colors.accentSoft})`,
-    color: "#fff",
-    fontWeight: "800",
-    boxShadow: theme.shadow.sm,
-  },
-  card: {
-    display: "grid",
-    gridTemplateColumns: "140px 1fr auto",
-    gap: "20px",
-    alignItems: "center",
-    border: `1px solid ${theme.colors.border}`,
-    borderRadius: theme.radius.md,
-    padding: "18px",
-    backgroundColor: theme.colors.surface,
-    boxShadow: theme.shadow.sm,
-  },
-  imageWrap: {
-    width: "140px",
-    height: "140px",
     borderRadius: "18px",
-    backgroundColor: theme.colors.surfaceSoft,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
-  },
-  image: {
-    width: "100%",
-    height: "100%",
-    objectFit: "contain",
-    padding: "14px",
-  },
-  info: {
-    minWidth: 0,
-  },
-  brand: {
-    margin: "0 0 8px",
-    fontSize: "13px",
-    fontWeight: "700",
-    color: theme.colors.textMuted,
-    textTransform: "uppercase",
-    letterSpacing: "0.4px",
-  },
-  name: {
-    margin: "0 0 10px",
-    fontSize: "22px",
-    color: theme.colors.text,
-  },
-  itemPrice: {
-    margin: "0 0 14px",
-    color: theme.colors.text,
-    fontSize: "18px",
-    fontWeight: "700",
-  },
-  actions: {
-    display: "flex",
-    gap: "14px",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-  qtyBox: {
-    display: "flex",
-    alignItems: "center",
-    gap: "12px",
-    padding: "8px 12px",
-    borderRadius: "14px",
-    backgroundColor: theme.colors.surfaceSoft,
-    border: `1px solid ${theme.colors.border}`,
-  },
-  qtyBtn: {
-    width: "36px",
-    height: "36px",
-    border: "none",
-    borderRadius: "10px",
-    backgroundColor: theme.colors.primary,
+    padding: "15px",
+    background: theme.gradients.primary,
     color: "#fff",
-    cursor: "pointer",
-    fontSize: "20px",
-    fontWeight: "700",
+    fontWeight: 950,
+    boxShadow: "0 18px 38px rgba(59,130,246,.25)",
   },
-  qtyValue: {
-    minWidth: "20px",
+
+  continueLink: {
+    display: "block",
+    marginTop: "14px",
     textAlign: "center",
-    fontWeight: "800",
-    color: theme.colors.text,
-  },
-  removeBtn: {
-    padding: "10px 14px",
-    border: "none",
-    borderRadius: "12px",
-    backgroundColor: "#FEECEC",
-    color: theme.colors.danger,
-    cursor: "pointer",
-    fontWeight: "700",
-  },
-  subtotal: {
-    fontWeight: "800",
-    color: theme.colors.text,
-    fontSize: "20px",
-    minWidth: "110px",
-    textAlign: "right",
-  },
-  emptyContainer: {
-    maxWidth: "700px",
-    margin: "60px auto",
-    padding: "60px 30px",
-    textAlign: "center",
-    borderRadius: theme.radius.lg,
-    backgroundColor: theme.colors.surface,
-    border: `1px solid ${theme.colors.border}`,
-    boxShadow: theme.shadow.md,
-  },
-  emptyIcon: {
-    fontSize: "52px",
-    marginBottom: "14px",
-  },
-  emptyTitle: {
-    margin: "0 0 12px",
-    color: theme.colors.text,
-    fontSize: "36px",
-  },
-  emptyText: {
-    margin: "0 0 22px",
-    color: theme.colors.textMuted,
-    fontSize: "16px",
-  },
-  shopBtn: {
-    display: "inline-block",
-    padding: "14px 22px",
-    borderRadius: "16px",
+    color: theme.colors.accent,
     textDecoration: "none",
-    background: `linear-gradient(135deg, ${theme.colors.accent}, ${theme.colors.accentSoft})`,
-    color: "#fff",
-    fontWeight: "800",
+    fontWeight: 900,
+  },
+
+  emptyState: {
+    minHeight: "560px",
+    borderRadius: theme.radius.xl,
+    background: "linear-gradient(135deg, #FFFFFF, #EEF2FF)",
+    border: `1px solid ${theme.colors.border}`,
     boxShadow: theme.shadow.sm,
+    display: "grid",
+    placeItems: "center",
+    textAlign: "center",
+    padding: "40px",
+  },
+
+  emptyIcon: {
+    width: "90px",
+    height: "90px",
+    borderRadius: "30px",
+    display: "grid",
+    placeItems: "center",
+    fontSize: "44px",
+    background: "#fff",
+    boxShadow: theme.shadow.sm,
+    margin: "0 auto 18px",
+  },
+
+  emptyTitle: {
+    margin: 0,
+    fontSize: "42px",
+    fontWeight: 950,
+  },
+
+  emptyText: {
+    margin: "14px auto 24px",
+    color: theme.colors.textMuted,
+    maxWidth: "540px",
+    lineHeight: 1.7,
+    fontWeight: 600,
+  },
+
+  primaryBtn: {
+    display: "inline-flex",
+    textDecoration: "none",
+    borderRadius: "18px",
+    padding: "15px 24px",
+    background: theme.gradients.primary,
+    color: "#fff",
+    fontWeight: 950,
   },
 };
 

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import ProductCard from "./ProductCard";
+import SkeletonCard from "./SkeletonCard";
 import { getRelatedProducts } from "../services/productService";
+import { theme } from "../styles/theme";
 
 function RelatedProducts({ category, currentProductId }) {
   const [products, setProducts] = useState([]);
@@ -24,43 +26,54 @@ function RelatedProducts({ category, currentProductId }) {
     fetchRelatedProducts();
   }, [category, currentProductId]);
 
-  if (loading) {
-    return (
-      <div style={styles.container}>
-        <h2 style={styles.heading}>You may also like</h2>
-        <p>Loading related products...</p>
-      </div>
-    );
-  }
-
-  if (products.length === 0) {
-    return null;
-  }
+  if (!loading && products.length === 0) return null;
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.heading}>You may also like</h2>
-
-      <div style={styles.grid}>
-        {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
-        ))}
+    <section style={styles.container} className="fade-up">
+      <div style={styles.header}>
+        <p style={styles.label}>Recommended</p>
+        <h2 style={styles.heading}>You may also like</h2>
       </div>
-    </div>
+
+      <div style={styles.grid} className="product-grid">
+        {loading
+          ? [...Array(4)].map((_, index) => <SkeletonCard key={index} />)
+          : products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+      </div>
+    </section>
   );
 }
 
 const styles = {
   container: {
-    marginTop: "50px",
+    marginTop: "34px",
   },
+
+  header: {
+    marginBottom: "18px",
+  },
+
+  label: {
+    margin: "0 0 8px",
+    color: theme.colors.accent,
+    fontSize: "13px",
+    fontWeight: 950,
+    textTransform: "uppercase",
+    letterSpacing: ".6px",
+  },
+
   heading: {
-    marginBottom: "20px",
+    margin: 0,
+    fontSize: "32px",
+    fontWeight: 950,
   },
+
   grid: {
     display: "flex",
     flexWrap: "wrap",
-    gap: "20px",
+    gap: "22px",
   },
 };
 
